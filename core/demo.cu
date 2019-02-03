@@ -76,23 +76,56 @@ int main(int argc, char * argv[]) {
   for (int line_idx = 0; line_idx < 7; ++line_idx) {
     std::string line_str;
     std::getline(pointcloud_file, line_str);
-    if (line_idx == 2) {
-      std::istringstream tmp_line(line_str);
-      std::string tmp_line_prefix;
-      tmp_line >> tmp_line_prefix;
-      tmp_line >> tmp_line_prefix;
-      tmp_line >> num_pts;
+    if (line_idx >= 2) {
+	   if (num_pts == 0) {
+	      std::istringstream tmp_line(line_str);
+	      std::string tmp_line_prefix;
+	      tmp_line >> tmp_line_prefix;
+	      tmp_line >> tmp_line_prefix;
+	      tmp_line >> num_pts;
+	}
     }
   }
   if (num_pts == 0) {
-    std::cerr << "Third line of .ply file does not tell me number of points. Double check format of point cloud file (or change .ply file reader code)." << std::endl;
+    std::cerr << "Line 3-7 of .ply file does not tell me number of points. Double check format of point cloud file (or change .ply file reader code)." << std::endl;
     return 0;
   }
   float * pts = new float[num_pts * 3]; // Nx3 matrix saved as float array (row-major order)
-  pointcloud_file.read((char*)pts, sizeof(float) * num_pts * 3);
+
+
+//  pointcloud_file.read((char*)pts, sizeof(float) * num_pts * 3);
+
+    std::string   line;
+    int idx=0;
+    int ctx=0;
+    // Read one line at a time into the variable line:
+    while(std::getline(pointcloud_file, line))
+    {
+        std::vector<float>   lineData;
+        std::stringstream  lineStream(line);
+
+        float value;
+        // Read an integer at a time from the line
+        while(lineStream >> value)
+        {
+            // Add the integers from a line to a 1D array (vector)
+            //lineData.push_back(value);
+	    pts[idx * 3 + ctx++ ] = value;
+	    if(ctx>2){
+		idx++;ctx=0;
+	    }
+        }
+    }
+
+
   pointcloud_file.close();
 
   std::cout << "Loaded point cloud with " << num_pts << " points!" << std::endl;
+
+	for (int pt_idx = 0; pt_idx < 10; ++pt_idx) {
+	std::cout << "[%d] [x,y,z]=[" << pt_idx << "] [" << pts[pt_idx * 3 + 0] << "," << pts[pt_idx * 3 + 1 ] << 
+		"," << pts[pt_idx * 3 + 2 ] << "]" << std::endl;
+	}
 
   float voxel_size = 0.01;
   float trunc_margin = voxel_size * 5;
@@ -120,6 +153,10 @@ int main(int argc, char * argv[]) {
   voxel_grid_origin_x = voxel_grid_origin_x - voxel_grid_padding * voxel_size + voxel_size / 2;
   voxel_grid_origin_y = voxel_grid_origin_y - voxel_grid_padding * voxel_size + voxel_size / 2;
   voxel_grid_origin_z = voxel_grid_origin_z - voxel_grid_padding * voxel_size + voxel_size / 2;
+
+	std::cout << "[x min,xmax]=[" << voxel_grid_origin_x << "," << voxel_grid_max_x << "]" << std::endl;
+	std::cout << "[y min,max]=[" << voxel_grid_origin_y << "," << voxel_grid_max_y << "]" << std::endl;
+	std::cout << "[z min,max]=[" << voxel_grid_origin_z << "," << voxel_grid_max_z << "]" << std::endl;
 
   std::cout << "Size of TDF voxel grid: " << voxel_grid_dim_x << " x " << voxel_grid_dim_y << " x " << voxel_grid_dim_z << std::endl;
   std::cout << "Computing TDF voxel grid..." << std::endl;

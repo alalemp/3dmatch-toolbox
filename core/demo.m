@@ -4,11 +4,13 @@
 % Add dependencies (for RANSAC-based rigid transform estimation)
 addpath(genpath('external'));
 
-fragment1PointCloudFile = '../data/sample/3dmatch-demo/single-depth-1.ply';
+% fragment1PointCloudFile = '../data/sample/3dmatch-demo/single-depth-1.ply';
+fragment1PointCloudFile = '../data2/box2_small.ply';
 fragment1KeypointsFile = 'fragment-1.keypts.bin';
 fragment1DescriptorsFile = 'fragment-1.desc.3dmatch.bin';
 
-fragment2PointCloudFile = '../data/sample/3dmatch-demo/single-depth-2.ply';
+% fragment2PointCloudFile = '../data/sample/3dmatch-demo/single-depth-2.ply';
+fragment2PointCloudFile = '../data2/box4_small.ply';
 fragment2KeypointsFile = 'fragment-2.keypts.bin';
 fragment2DescriptorsFile = 'fragment-2.desc.3dmatch.bin';
 
